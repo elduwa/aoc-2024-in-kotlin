@@ -6,38 +6,59 @@ fun main() {
         return diff > 0 == ascending && abs(diff) <= 3 && abs(diff) > 0
     }
 
+    fun getDiffs(report: List<Int>) = (1..<report.size)
+        .map { report[it] - report[it - 1] }
+
     fun part1(reports : List<List<Int>>): Int {
         var safeCount = 0
 
-        for (report in reports) {
-            var safe = true
-            val ascending = report[1] - report[0] > 0
-            for (i in 1..<report.size) {
-                val diff = report[i] - report[i-1]
-                if (!isValidDiff(diff, ascending)) {
-                    safe = false
-                    break
-                }
-            }
+        reports.forEach { report ->
+            val diffs = getDiffs(report)
+            val ascending = diffs.sum() > 0
+            val safe = diffs.all { isValidDiff(it, ascending) }
             if (safe) safeCount++
         }
         return safeCount
     }
 
-    fun part2(listPair: Pair<List<Int>, List<Int>>): Int {
-        val leftList = listPair.first
-        val rightList = listPair.second
+    fun part2(reports : List<List<Int>>): Int {
+        var safeCount = 0
 
-        val rightListLocIdCounts = rightList.groupingBy { it }.eachCount()
+        reports.forEach { report ->
+            val diffs = getDiffs(report)
+            val ascCount = diffs.count { it > 0 }
+            val descCount = diffs.count { it < 0 }
+            val stagCount = diffs.count { it == 0 }
+            val ascending = ascCount > descCount
+            if (ascending && descCount + stagCount <= 1 || !ascending && ascCount + stagCount <= 1) {
+                var safe = diffs.all { isValidDiff(it, ascending) }
+                if (!safe) {
+                    val falseDiff = diffs.indexOfFirst { diff -> !isValidDiff(diff, ascending) }
+                    val reportCopy = report.toMutableList()
 
-        var similarityScore = 0
-
-        for (locId in leftList) {
-            val count = rightListLocIdCounts[locId]
-            count?.let { similarityScore += locId * count }
+                    if (falseDiff == 0) {
+                        if (isValidDiff(diffs[1], ascending)) {
+                            reportCopy.removeAt(0)
+                        } else if (isValidDiff(report[2] - report[0], ascending)) {
+                            reportCopy.removeAt(1)
+                        }
+                    } else if (falseDiff == diffs.size - 1) {
+                        if (isValidDiff(diffs[diffs.size - 2], ascending)) {
+                            reportCopy.removeAt(diffs.size)
+                        } else if (isValidDiff(report[diffs.size] - report[diffs.size - 2], ascending)) {
+                            reportCopy.removeAt(diffs.size - 1)
+                        }
+                    } else {
+                        reportCopy.removeAt(falseDiff + 1)
+                    }
+                    val adjustedDiffs = getDiffs(reportCopy)
+                    safe = adjustedDiffs.all { isValidDiff(it, ascending) }
+                    if (!safe) println(reportCopy)
+                }
+                if (safe) safeCount++ else println(report)
+            }
         }
-
-        return similarityScore
+        return safeCount
     }
 
     fun parseReports(input: List<String>) : List<List<Int>> {
@@ -56,11 +77,11 @@ fun main() {
     val testInput = readInput("Day02_test")
     val testReports = parseReports(testInput)
     check(part1(testReports) == 2)
-    //check(part2(testLocIdLists) == 31)
+    check(part2(testReports) == 7)
 
     // Read the input from the `src/Day01.txt` file.
     val input = readInput("Day02")
     val locIdLists = parseReports(input)
     part1(locIdLists).println()
-    //part2(locIdLists).println()
+    part2(locIdLists).println()
 }
