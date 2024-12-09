@@ -10,8 +10,8 @@ fun main() {
         for ((x, y) in directions) {
             if (posX + minDirection * x >= nCols || posX + minDirection * x < 0
                 || posX + maxDirection * x >= nCols || posX + maxDirection * x < 0
-                || posY + minDirection * y >= nCols || posY + minDirection * y < 0
-                || posY + maxDirection * y >= nCols || posY + maxDirection * y < 0) {
+                || posY + minDirection * y >= nRows || posY + minDirection * y < 0
+                || posY + maxDirection * y >= nRows || posY + maxDirection * y < 0) {
                 continue
             }
             val directionCharacters = mutableListOf<Char>()
