@@ -39,3 +39,15 @@ enum class Direction(val dir : Pair<Int, Int>) {
 fun parseCharacterGrid(input : List<String>) : Array<CharArray> {
     return input.map { it.toCharArray() }.toTypedArray()
 }
+
+fun euclidianGCD(a : Int, b : Int) : Int {
+    val aa = a.absoluteValue
+    val bb = b.absoluteValue
+    val high = if (aa >= bb) aa else bb
+    val low = if (aa < bb) aa else bb
+
+    if (low == 0) return high
+
+    val remainder = high % low
+    return euclidianGCD(low, remainder)
+}
