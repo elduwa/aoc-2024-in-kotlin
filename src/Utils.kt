@@ -40,6 +40,10 @@ fun parseCharacterGrid(input : List<String>) : Array<CharArray> {
     return input.map { it.toCharArray() }.toTypedArray()
 }
 
+fun parseIntGrid(input: List<String>) : Array<IntArray> {
+    return input.map { line -> line.toCharArray().map { it.digitToInt() }.toIntArray() }.toTypedArray()
+}
+
 fun euclidianGCD(a : Int, b : Int) : Int {
     val aa = a.absoluteValue
     val bb = b.absoluteValue
